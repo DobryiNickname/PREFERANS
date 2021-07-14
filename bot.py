@@ -1,4 +1,5 @@
-import numpy as np
+import operator
+
 import consts
 
 
@@ -11,11 +12,13 @@ class Bot:
 
     def show_hand(self) -> None:
         """
-        Show hand in terms of card's value and suit.
+        Show sorted hand in terms of card's value and suit.
 
-        :param hand: List of cards
         :return: None
         """
-        for card in self.hand:
+        unsorted_hand = self.hand
+        # Возможно передлать под кастомный запрос человека.
+        sorted_hand = sorted(unsorted_hand, key=operator.attrgetter("suit", "value"), reverse=True)
+        for card in sorted_hand:
             print(consts.CARD_VALUE_DICT[card.value]
                   + consts.CARD_SUIT_DICT[card.suit])

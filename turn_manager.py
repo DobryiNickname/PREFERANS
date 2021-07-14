@@ -4,26 +4,25 @@ import numpy as np
 
 
 class TurnManager:
-    def __init__(self, pref):
+    def __init__(self):
         self.talon = None
-        # Узнать у шарящих людей можно ли так делать?
-        self.pref = pref
+        # Нужно больше полей
 
-    def run(self):
-        self._deal_cards()
-        self.pref.Bot_1.show_hand()
-
-    def _deal_cards(self) -> None:
+    def deal_cards(self) -> list:
         """
         Generate random shuffle per turn.
 
-        :return: None
+        :return: List of hands
         """
         shuffled_deck = np.arange(32)
         np.random.shuffle(shuffled_deck)
 
-        self.pref.Bot_1.set_hand([Card(x % 8, x // 8) for x in shuffled_deck[0:10]])
-        self.pref.Bot_2.set_hand([Card(x % 8, x // 8) for x in shuffled_deck[10:20]])
-        self.pref.Bot_3.set_hand([Card(x % 8, x // 8) for x in shuffled_deck[20:30]])
+        hands = [
+            [Card(x % 8, x // 8) for x in shuffled_deck[0:10]],
+            [Card(x % 8, x // 8) for x in shuffled_deck[10:20]],
+            [Card(x % 8, x // 8) for x in shuffled_deck[20:30]]
+        ]
 
-        self.talon = [Card(x % 8, x // 8) for x in shuffled_deck[20:30]]
+        self.talon = [Card(x % 8, x // 8) for x in shuffled_deck[30:32]]
+
+        return hands
