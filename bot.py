@@ -1,13 +1,18 @@
-from card import Card
+import numpy as np
+import consts
 
 
 class Bot:
-    def __init__(self):
-        self.hand = None
+    def __init__(self, hand):
+        self.hand = hand
 
-    def _deal_card(self) -> Card:
+    def show_hand(self) -> None:
         """
-        Deal card from hand
+        Show hand in terms of card's value and suit.
 
-        :return: Card from hand
+        :param hand: List of cards
+        :return: None
         """
+        for card in self.hand:
+            print(consts.CARD_VALUE_DICT[card.value]
+                  + consts.CARD_SUIT_DICT[card.suit])
