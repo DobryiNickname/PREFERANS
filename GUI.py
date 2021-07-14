@@ -36,4 +36,3 @@ class GUI:
 
 
 GUI.callable()
-

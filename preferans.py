@@ -1,9 +1,12 @@
-from turn import Turn
+from turn_manager import TurnManager
+from bot import Bot
 
 
 class Preferans:
     def __init__(self):
-        pass
+        self.Bot_1 = Bot()
+        self.Bot_2 = Bot()
+        self.Bot_3 = Bot()
 
     @classmethod
     def callable(cls) -> None:
@@ -13,12 +16,9 @@ class Preferans:
     def run(self) -> None:
         self._generate_turn()
 
-    @staticmethod
-    def _generate_turn() -> None:
-        turn = Turn()
-        turn.run_turn()
+    def _generate_turn(self) -> None:
+        turn = TurnManager(self)
+        turn.run()
 
 
 Preferans.callable()
-
-

@@ -3,7 +3,10 @@ import consts
 
 
 class Bot:
-    def __init__(self, hand):
+    def __init__(self):
+        self.hand = None
+
+    def set_hand(self, hand):
         self.hand = hand
 
     def show_hand(self) -> None:
