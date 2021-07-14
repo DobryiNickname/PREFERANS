@@ -6,6 +6,8 @@ import numpy as np
 class TurnManager:
     def __init__(self):
         self.talon = None
+        self.order = None
+        self.game_turn_info = None
         # Нужно больше полей
 
     def deal_cards(self) -> list:
@@ -26,3 +28,6 @@ class TurnManager:
         self.talon = [Card(x % 8, x // 8) for x in shuffled_deck[30:32]]
 
         return hands
+
+    def trick_and_order(self):
+        pass

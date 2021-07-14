@@ -3,6 +3,7 @@
 from bot import Bot
 from turn_manager import TurnManager
 from trade_manager import TradeManager
+from rule_manager import RuleManager
 
 import consts
 
@@ -28,6 +29,7 @@ class Preferans:
     def _start_turn(self) -> TurnManager:
         turn = TurnManager()
         trade = TradeManager()
+        rules = RuleManager()
 
         hands = turn.deal_cards()
         self.Bot_1.set_hand(hands[0])

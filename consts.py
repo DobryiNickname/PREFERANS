@@ -30,5 +30,5 @@ TABLE = {
     "WHIST_31": 0,
     "WHIST_32": 0,
     "BID": 1,
-    "END": 11
+    "END": 2
 }

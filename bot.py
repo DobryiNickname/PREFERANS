@@ -22,3 +22,7 @@ class Bot:
         for card in sorted_hand:
             print(consts.CARD_VALUE_DICT[card.value]
                   + consts.CARD_SUIT_DICT[card.suit])
+
+    def predict_card(self):
+        # random choise -> rules?
+        pass
