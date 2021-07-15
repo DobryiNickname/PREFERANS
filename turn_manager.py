@@ -7,8 +7,8 @@ class TurnManager:
     def __init__(self):
         self.talon = None
         self.order = None
-        self.game_turn_info = None
-        # Нужно больше полей
+        self.trump = None
+        self.cards_on_board = None
 
     def deal_cards(self) -> list:
         """

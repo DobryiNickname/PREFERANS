@@ -1,6 +1,8 @@
 # import pandas as pd
+import numpy as np
 
 from bot import Bot
+from card import Card
 from turn_manager import TurnManager
 from trade_manager import TradeManager
 from rule_manager import RuleManager
@@ -13,6 +15,8 @@ class Preferans:
         self.Bot_1 = Bot()
         self.Bot_2 = Bot()
         self.Bot_3 = Bot()
+
+        self.rules = RuleManager()
 
         self.PointsDf = consts.TABLE
 
@@ -29,14 +33,29 @@ class Preferans:
     def _start_turn(self) -> TurnManager:
         turn = TurnManager()
         trade = TradeManager()
-        rules = RuleManager()
 
         hands = turn.deal_cards()
         self.Bot_1.set_hand(hands[0])
         self.Bot_2.set_hand(hands[1])
         self.Bot_3.set_hand(hands[2])
 
-        self.Bot_3.show_hand()
+        # trade.begin_trade(b1, b2, b3)
+        # turn.set_game_specifications(trade...)
+
+        # test
+        turn.cards_on_board = np.array([Card(8, 2)])
+        turn.trump = 3
+        valid_moves = self.rules.valid_moves(
+                self.Bot_1.hand,
+                turn.cards_on_board,
+                turn.trump
+            )
+        self.Bot_1.show_valid_moves(valid_moves)
+        # end test
+
+        # The game itself
+        for _ in range(10):
+            pass
 
         return turn
 

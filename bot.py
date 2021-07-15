@@ -23,6 +23,15 @@ class Bot:
             print(consts.CARD_VALUE_DICT[card.value]
                   + consts.CARD_SUIT_DICT[card.suit])
 
+    @staticmethod
+    def show_valid_moves(valid_moves):
+        unsorted_hand = valid_moves
+        # Возможно передлать под кастомный запрос человека.
+        sorted_hand = sorted(unsorted_hand, key=operator.attrgetter("suit", "value"), reverse=True)
+        for card in sorted_hand:
+            print(consts.CARD_VALUE_DICT[card.value]
+                  + consts.CARD_SUIT_DICT[card.suit])
+
     def predict_card(self):
         # random choise -> rules?
         pass
