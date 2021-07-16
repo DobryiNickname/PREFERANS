@@ -9,6 +9,8 @@ class TurnManager:
         self.order = None
         self.trump = None
         self.cards_on_board = None
+        self.discard = None
+        self.
 
     def deal_cards(self) -> list:
         """

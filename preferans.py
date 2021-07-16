@@ -18,7 +18,7 @@ class Preferans:
 
         self.rules = RuleManager()
 
-        self.PointsDf = consts.TABLE
+        self.PointsDf = consts.SCORE_TABLE
 
     @classmethod
     def callable(cls) -> None:
