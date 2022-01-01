@@ -6,11 +6,11 @@ import numpy as np
 class TurnManager:
     def __init__(self):
         self.talon = None
-        self.order = None
+        self.game_order = None
+        self.turn_order = None
         self.trump = None
         self.cards_on_board = None
         self.discard = None
-        self.
 
     def deal_cards(self) -> list:
         """

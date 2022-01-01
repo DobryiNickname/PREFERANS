@@ -5,6 +5,4 @@ class TradeManager:
     def set_game_mode(self) -> int:
         game_mode = None
 
-        
-
         return game_mode
