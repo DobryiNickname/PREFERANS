@@ -6,9 +6,12 @@ from card import Card, MetaCard, MetaHand
 
 
 class Bot:
-    def __init__(self):
+    def __init__(self, bot_id):
         self.hand = None
         self.meta_hand = None
+        self.is_my_turn = None
+        self.when_to_put_card = None
+        self.bot_id = bot_id
 
     def set_hand_and_metahand(self, hand: List[Card]):
         self.hand = hand
