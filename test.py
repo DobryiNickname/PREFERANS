@@ -4,11 +4,12 @@ from bot import Bot
 
 import consts
 
+import copy
+
 
 class Node:
     def __init__(self):
         self.leaves = []
-        self.parent = None
         self.bot_0_score = None
         self.bot_1_score = None
         self.bot_2_score = None
@@ -19,9 +20,6 @@ class Node:
     def append_leave(self, node):
         self.leaves.append(node)
 
-    def set_parent(self, parent):
-        self.parent = parent
-
     def set_triplet_value(self, triplet):
         self.triplet = triplet
         if (triplet[0].value > triplet[1].value) and (triplet[0].value > triplet[2].value):
@@ -30,39 +28,53 @@ class Node:
             self.triplet_value = 0
 
 
-def build_tree(bot_0, bot_1, bot_2,
-               parent, recursion_level, current_order, trump=0):
+def build_tree(mh_0, mh_1, mh_2, recursion_level, current_order, trump=0):
 
-    if recursion_level == 9:
-        return None
+    if recursion_level == 0:
+        return Node()
 
     ruleman = RuleManager()
 
     init_node = Node()
-    init_node.set_parent(parent)
 
     # Просто боты в списке
-    bot_list = [bot_0, bot_1, bot_2]
+    mh_list = [mh_0, mh_1, mh_2]
     # Тут будут боты в правильной последовательности
-    bot_order = []
+    mh_order = []
     for id in current_order:
-        for bot in bot_list:
-            if bot.bot_id == id:
-                bot_order.append(bot)
+        mh_order.append(mh_list[id])
 
     metacards_on_board = []
-    zero_hand = ruleman.valid_moves(bot_order[0].meta_hand, metacards_on_board, trump=trump)
+
+    zero_hand = ruleman.valid_moves(mh_order[0], metacards_on_board, trump)
     for mc_0 in zero_hand:
         metacards_on_board.append(mc_0)
-        first_hand = ruleman.valid_moves(bot_order[1].meta_hand, metacards_on_board, trump=trump)
+        first_hand = ruleman.valid_moves(mh_order[1], metacards_on_board, trump)
         for mc_1 in first_hand:
-            second_hand = ruleman.valid_moves(bot_order[2].meta_hand, metacards_on_board, trump=trump)
+            second_hand = ruleman.valid_moves(mh_order[2], metacards_on_board, trump)
             for mc_2 in second_hand:
-                init_node.triplet = [mc_0, mc_1, mc_2]
+                turn_node = Node()
+                turn_node.triplet = [mc_0, mc_1, mc_2]
 
-                # Присвоение очков за ход
-                if mc_0.suit == trump: # Проверям, положен ли козырь
-                    pass
+                copy_mh_0 = copy.deepcopy(mh_0)
+                copy_mh_0.decrease_capacity(turn_node.triplet[current_order.index(0)])
+                copy_mh_0.update_metahand()
+                copy_mh_1 = copy.deepcopy(mh_1)
+                copy_mh_1.decrease_capacity(turn_node.triplet[current_order.index(1)])
+                copy_mh_1.update_metahand()
+                copy_mh_2 = copy.deepcopy(mh_2)
+                copy_mh_2.decrease_capacity(turn_node.triplet[current_order.index(2)])
+                copy_mh_2.update_metahand()
+
+                turn_node.append_leave(
+                    build_tree(
+                        copy_mh_0, copy_mh_1, copy_mh_2, recursion_level - 1, current_order,
+                        trump=trump
+                    )
+                )
+
+                init_node.append_leave(turn_node)
+
         metacards_on_board = []
 
     return init_node
@@ -81,32 +93,33 @@ def set_order_after_trick(metacard_1, metacard_2, metacard_3):
 def show_tree(tree_prm):
     for i in tree_prm.leaves:
         print("Triplet - "
-              f"({consts.CARD_SUIT_DICT[i.triplet[0].suit]+consts.CARD_VALUE_DICT[i.triplet[0].value]},"
-              f"{consts.CARD_SUIT_DICT[i.triplet[1].suit]+consts.CARD_VALUE_DICT[i.triplet[1].value]},"
-              f"{consts.CARD_SUIT_DICT[i.triplet[2].suit]+consts.CARD_VALUE_DICT[i.triplet[2].value]})"
-              f"Value of turn - {i.triplet_value}"
+              f"({consts.CARD_VALUE_DICT[i.triplet[0].value]+consts.CARD_SUIT_DICT[i.triplet[0].suit]},"
+              f"{consts.CARD_VALUE_DICT[i.triplet[1].value]+consts.CARD_SUIT_DICT[i.triplet[1].suit]},"
+              f"{consts.CARD_VALUE_DICT[i.triplet[2].value]+consts.CARD_SUIT_DICT[i.triplet[2].suit]})"
+              # f"Value of turn - {i.triplet_value}"
               )
-
-
 
 
 turn = TurnManager()
 hands = turn.deal_cards()
-# tree = build_tree(hands[0], hands[1], hands[2])
 
-bot1 = Bot()
-bot1.set_hand_and_metahand(hands[0])
+
+bot0 = Bot(0)
+bot0.set_hand_and_metahand(hands[0])
+bot0.show_hand()
+
+bot1 = Bot(1)
+bot1.set_hand_and_metahand(hands[1])
 bot1.show_hand()
-bot1.show_metahand()
 
-# bot2 = Bot()
-# bot2.set_hand(hands[1])
-# bot2.show_hand()
-#
-# bot3 = Bot()
-# bot3.set_hand(hands[2])
-# bot3.show_hand()
-#
-# show_tree(tree)
+bot2 = Bot(2)
+bot2.set_hand_and_metahand(hands[2])
+bot2.show_hand()
+
+tree = build_tree(
+    bot0.meta_hand, bot1.meta_hand, bot2.meta_hand, 1, [0, 1, 2], trump=0
+)
+
+show_tree(tree)
 
 

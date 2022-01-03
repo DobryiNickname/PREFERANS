@@ -30,9 +30,6 @@ class MetaCard:
     def update_metacard_capacity(self):
         self.capacity = len(self.cards)
 
-    def decrease_capacity(self):
-        self.capacity -= 1
-
 
 class MetaHand:
     def __init__(self):
@@ -45,3 +42,8 @@ class MetaHand:
         for metacard in self.metahand:
             if metacard.capacity == 0:
                 self.metahand.remove(metacard)
+
+    def decrease_capacity(self, metacard: MetaCard):
+        for mc in self.metahand:
+            if (mc.value == metacard.value) and (mc.suit == metacard.suit):
+                mc.capacity -= 1
