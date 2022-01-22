@@ -55,6 +55,7 @@ class Preferans:
 
         # The game itself
         for _ in range(10):
+
             pass
 
         return turn

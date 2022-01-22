@@ -5,6 +5,7 @@ from bot import Bot
 import consts
 
 import copy
+import time
 
 
 class Node:
@@ -14,6 +15,9 @@ class Node:
         self.bot_1_score = None
         self.bot_2_score = None
         self.triplet = None
+
+        self.bot_game_score = None
+        self.bot_whist_score = None
 
         self.triplet_value = None
 
@@ -28,16 +32,17 @@ class Node:
             self.triplet_value = 0
 
 
-def build_tree(mh_0, mh_1, mh_2, recursion_level, current_order, trump=0):
+def build_tree(mh_0, mh_1, mh_2, recursion_level, current_order, trump=0, id_bot_game=0):
 
     if recursion_level == 0:
         return Node()
 
     ruleman = RuleManager()
 
+    # Терминальная нода, пустая, хранит все возможные ходы данного уровня рекурсии
     init_node = Node()
 
-    # Просто боты в списке
+    # Просто руки ботов в списке
     mh_list = [mh_0, mh_1, mh_2]
     # Тут будут боты в правильной последовательности
     mh_order = []
@@ -66,38 +71,61 @@ def build_tree(mh_0, mh_1, mh_2, recursion_level, current_order, trump=0):
                 copy_mh_2.decrease_capacity(turn_node.triplet[current_order.index(2)])
                 copy_mh_2.update_metahand()
 
+                new_order = set_order_after_trick(turn_node.triplet, trump)
+                turn_node.bot_0_score = int(new_order[0] == 0)
+                turn_node.bot_1_score = int(new_order[0] == 1)
+                turn_node.bot_2_score = int(new_order[0] == 2)
+
                 turn_node.append_leave(
                     build_tree(
-                        copy_mh_0, copy_mh_1, copy_mh_2, recursion_level - 1, current_order,
+                        copy_mh_0, copy_mh_1, copy_mh_2, recursion_level - 1, new_order,
                         trump=trump
                     )
                 )
 
                 init_node.append_leave(turn_node)
 
+
         metacards_on_board = []
+
+    #if current_order[0] == id_bot_game:
+    #    init_node.bot_game_score = any([getattr(leave, "bot_"+str(id_bot_game)+"_score") == 1 for leave in init_node.leaves])
 
     return init_node
 
 
-def set_order_after_trick(metacard_1, metacard_2, metacard_3):
+def set_order_after_trick(triplet, trump):
     """Return order of bot_id"""
-    if (metacard_1.value > metacard_2.value) and (metacard_1.value > metacard_3.value):
+    if not any([card.suit == trump for card in triplet]):
+        trump = triplet[0].suit
+
+    check_trump_cards = []
+    for index, card in enumerate(triplet):
+        if card.suit == trump:
+            check_trump_cards.append((index, card))
+
+    sort_check = sorted(check_trump_cards, key=lambda x: x[1].value, reverse=True)
+
+    if sort_check[0][0] == 0:
         return [0, 1, 2]
-    elif (metacard_2.value > metacard_1.value) and (metacard_2.value > metacard_3.value):
-        return [2, 0, 1]
-    else:
+    elif sort_check[0][0] == 1:
         return [1, 2, 0]
+    else:
+        return [2, 0, 1]
 
 
-def show_tree(tree_prm):
-    for i in tree_prm.leaves:
+def show_tree(tree_prm, tab):
+    if len(tree_prm.leaves) == 0:
+        return
+
+    for leave in tree_prm.leaves:
+        print("\t" * tab, end="")
         print("Triplet - "
-              f"({consts.CARD_VALUE_DICT[i.triplet[0].value]+consts.CARD_SUIT_DICT[i.triplet[0].suit]},"
-              f"{consts.CARD_VALUE_DICT[i.triplet[1].value]+consts.CARD_SUIT_DICT[i.triplet[1].suit]},"
-              f"{consts.CARD_VALUE_DICT[i.triplet[2].value]+consts.CARD_SUIT_DICT[i.triplet[2].suit]})"
-              # f"Value of turn - {i.triplet_value}"
+              f"({consts.CARD_VALUE_DICT[leave.triplet[0].value] + consts.CARD_SUIT_DICT[leave.triplet[0].suit]},"
+              f"{consts.CARD_VALUE_DICT[leave.triplet[1].value] + consts.CARD_SUIT_DICT[leave.triplet[1].suit]},"
+              f"{consts.CARD_VALUE_DICT[leave.triplet[2].value] + consts.CARD_SUIT_DICT[leave.triplet[2].suit]})"
               )
+        show_tree(leave.leaves[0], tab+1)
 
 
 turn = TurnManager()
@@ -116,10 +144,13 @@ bot2 = Bot(2)
 bot2.set_hand_and_metahand(hands[2])
 bot2.show_hand()
 
+start = time.time()
 tree = build_tree(
-    bot0.meta_hand, bot1.meta_hand, bot2.meta_hand, 1, [0, 1, 2], trump=0
+    bot0.meta_hand, bot1.meta_hand, bot2.meta_hand, 2, [0, 1, 2], trump=0, id_bot_game=1
 )
+end = time.time()
+print(end-start)
 
-show_tree(tree)
+#show_tree(tree, 0)
 
 
