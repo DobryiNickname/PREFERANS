@@ -61,16 +61,23 @@ def valid_moves(metahand: MetaHand, metacards_on_board: Dict[str, MetaCard], tru
 
 
 def determine_bot_order(cards_on_board: Dict[str, MetaCard], bot_order: List[int], trump=None):
+
+    mapping = {
+        cards_on_board['first_card']: bot_order[0],
+        cards_on_board['second_card']: bot_order[1],
+        cards_on_board['third_card']: bot_order[2]
+    }
+
     if not any([card.get_suit() == trump for card in cards_on_board.values()]):
         trump = cards_on_board["first card"].get_suit()
 
-    check_trump_cards = [(index_and_card, botid) for index_and_card, botid in zip(dict.items(), bot_order) if index_and_card[1].get_suit() == trump]
+    trump_cards = [card for card in cards_on_board.values() if card.get_suit() == trump]
+    sort_by_value_trump_cards = sorted(trump_cards, key=lambda x: x.get_value(), reverse=True)
 
-    sort_check = sorted(check_trump_cards, key=lambda x: x[0][1].value, reverse=True)  # x - ((str, card), id )
-
-    if sort_check[0][1] == 0:  # [((str, card),id)]
+    winner_id = mapping[sort_by_value_trump_cards[0]]
+    if winner_id == 0:
         return [0, 1, 2]
-    elif sort_check[0][1] == 1:
+    elif winner_id == 1:
         return [1, 2, 0]
     else:
         return [2, 0, 1]
