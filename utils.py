@@ -84,7 +84,10 @@ def determine_bot_order(cards_on_board: Dict[str, MetaCard], bot_order: List[int
         return bot_order_mapping["third bot turn"]
 
 
-def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int]):
+def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int], trump, current_depth, max_depth=5):
+    if current_depth == max_depth:
+        return None
+
     first_bot_id = bot_order[0]
     first_bot = bot_id_mapping[first_bot_id]
 
@@ -96,7 +99,9 @@ def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int]):
 
     for first_card in first_bot.meta_hand.metahand:
         cards_on_table["first card"] = first_card
-        print(cards_on_table["first card"])
+        if current_depth == 1:
+            print(f'first card = {cards_on_table["first card"]}')
+        # print(f"cur_rec = {current_depth}")
 
         copy_first_bot = copy.deepcopy(first_bot)
         copy_first_bot.meta_hand.decrease_card_capacity(first_card)
@@ -119,12 +124,12 @@ def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int]):
                 copy_third_bot = copy.deepcopy(third_bot)
                 copy_third_bot.meta_hand.decrease_card_capacity(third_card)
 
-                bot_id_mapping = {
+                bot_id_mapping_next = {
                     copy_first_bot.bot_id: copy_first_bot,
                     copy_second_bot.bot_id: copy_second_bot,
                     copy_third_bot.bot_id: copy_third_bot,
                 }
-                # bot_order = determine_bot_order(cards_on_table, trump)
-                # put_cards_on_table(bot_id_mapping, bot_order)
+                bot_order_next = determine_bot_order(cards_on_table, bot_order, trump)
+                put_card_on_table(bot_id_mapping_next, bot_order_next, trump, current_depth + 1)
 
 

@@ -34,6 +34,6 @@ bot_order_mapping = {
 }
 
 start = time.time()
-put_card_on_table(bot_id_mapping, bot_order_mapping["first bot turn"])
+put_card_on_table(bot_id_mapping, bot_order_mapping["first bot turn"], 0, 1)
 end = time.time()
 print(end - start)
