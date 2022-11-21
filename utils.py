@@ -1,9 +1,10 @@
 import copy
+import numpy as np
+from typing import List, Dict
 
 from card import Card, MetaCard, MetaHand
 from bot import Bot
-import numpy as np
-from typing import List, Dict
+
 
 bot_order_mapping = {
     "first bot turn": [0, 1, 2],
@@ -63,9 +64,9 @@ def valid_moves(metahand: MetaHand, metacards_on_board: Dict[str, MetaCard], tru
 def determine_bot_order(cards_on_board: Dict[str, MetaCard], bot_order: List[int], trump=None):
 
     mapping = {
-        cards_on_board['first_card']: bot_order[0],
-        cards_on_board['second_card']: bot_order[1],
-        cards_on_board['third_card']: bot_order[2]
+        cards_on_board['first card']: bot_order[0],
+        cards_on_board['second card']: bot_order[1],
+        cards_on_board['third card']: bot_order[2]
     }
 
     if not any([card.get_suit() == trump for card in cards_on_board.values()]):
@@ -76,11 +77,11 @@ def determine_bot_order(cards_on_board: Dict[str, MetaCard], bot_order: List[int
 
     winner_id = mapping[sort_by_value_trump_cards[0]]
     if winner_id == 0:
-        return [0, 1, 2]
+        return bot_order_mapping["first bot turn"]
     elif winner_id == 1:
-        return [1, 2, 0]
+        return bot_order_mapping["second bot turn"]
     else:
-        return [2, 0, 1]
+        return bot_order_mapping["third bot turn"]
 
 
 def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int]):
