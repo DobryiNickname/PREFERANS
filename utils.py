@@ -112,7 +112,7 @@ def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int]):
 
             third_bot_id = bot_order[2]
             third_bot = bot_id_mapping[third_bot_id]
-            third_bot_valid_moves = valid_moves(second_bot.meta_hand, cards_on_table)
+            third_bot_valid_moves = valid_moves(third_bot.meta_hand, cards_on_table)
             for third_card in third_bot_valid_moves:
                 cards_on_table["third card"] = third_card
 
