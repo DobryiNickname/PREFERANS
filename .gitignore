@@ -1,4 +1,5 @@
 .idea/
 venv/
+get_pip.py
 
 __pycache__/
