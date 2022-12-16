@@ -59,8 +59,8 @@ class MetaCard:
 
 
 class MetaHand:
-    def __init__(self):
-        self.metahand: List[MetaCard] = []
+    def __init__(self, metahand=None):
+        self.metahand: List[MetaCard] = metahand if metahand is not None else []
 
     def add_metacard(self, metacard: MetaCard):
         self.metahand.append(metacard)

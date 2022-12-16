@@ -7,9 +7,9 @@ from consts import CARD_SUIT_DICT, CARD_VALUE_DICT
 
 
 class Bot:
-    def __init__(self, bot_id):
-        self.hand: List[Card] = None
-        self.meta_hand: MetaHand = None
+    def __init__(self, bot_id, hand=None, meta_hand=None):
+        self.hand: List[Card] = hand
+        self.meta_hand: MetaHand = meta_hand
         self.bot_id = bot_id
 
     def set_hand_and_metahand(self, hand: List[Card]):
@@ -37,7 +37,6 @@ class Bot:
                     meta_hand.add_metacard(meta_card)
 
         self.meta_hand = meta_hand
-
     @staticmethod
     def format_card(card: Card):
         return CARD_VALUE_DICT[card.get_value()] + CARD_SUIT_DICT[card.get_suit()]

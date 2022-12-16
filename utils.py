@@ -1,5 +1,6 @@
 import copy
 import numpy as np
+import time
 from typing import List, Dict
 
 from card import Card, MetaCard, MetaHand
@@ -18,6 +19,7 @@ def generate_hands_and_talon() -> Dict[str, List[Card]]:
     Generate random shuffle per turn.
     :return: List of hands
     """
+    np.random.seed(69)
     shuffled_deck = np.arange(32)
     np.random.shuffle(shuffled_deck)
 
@@ -85,7 +87,7 @@ def determine_bot_order(cards_on_board: Dict[str, MetaCard], bot_order: List[int
 
 
 def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int], trump, current_depth, max_depth=5):
-    if current_depth == max_depth:
+    if current_depth > max_depth:
         return None
 
     first_bot_id = bot_order[0]
@@ -100,28 +102,34 @@ def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int], tru
     for first_card in first_bot.meta_hand.metahand:
         cards_on_table["first card"] = first_card
         if current_depth == 1:
-            print(f'first card = {cards_on_table["first card"]}')
-        # print(f"cur_rec = {current_depth}")
+            print(f'first card suit-{first_card.suit} value-{first_card.value}')
 
-        copy_first_bot = copy.deepcopy(first_bot)
+        start = time.time()
+        copy_first_bot = Bot(
+            first_bot_id, 
+            meta_hand=MetaHand(metahand=first_bot.meta_hand.metahand[:]))
+        end = time.time()
+        print(f"copy - {(end-start) * 10000}")
+
         copy_first_bot.meta_hand.decrease_card_capacity(first_card)
-
         second_bot_id = bot_order[1]
         second_bot = bot_id_mapping[second_bot_id]
-        second_bot_valid_moves = valid_moves(second_bot.meta_hand, cards_on_table)
+
+        second_bot_valid_moves = valid_moves(second_bot.meta_hand, cards_on_table, trump=trump)
         for second_card in second_bot_valid_moves:
             cards_on_table["second card"] = second_card
-
-            copy_second_bot = copy.deepcopy(second_bot)
+            copy_second_bot = Bot(second_bot_id, 
+                meta_hand=MetaHand(metahand=second_bot.meta_hand.metahand[:]))
             copy_second_bot.meta_hand.decrease_card_capacity(second_card)
 
             third_bot_id = bot_order[2]
             third_bot = bot_id_mapping[third_bot_id]
-            third_bot_valid_moves = valid_moves(third_bot.meta_hand, cards_on_table)
+            third_bot_valid_moves = valid_moves(third_bot.meta_hand, cards_on_table, trump=trump)
             for third_card in third_bot_valid_moves:
                 cards_on_table["third card"] = third_card
 
-                copy_third_bot = copy.deepcopy(third_bot)
+                copy_third_bot = Bot(third_bot_id,
+                    meta_hand=MetaHand(metahand=third_bot.meta_hand.metahand[:]))
                 copy_third_bot.meta_hand.decrease_card_capacity(third_card)
 
                 bot_id_mapping_next = {
@@ -129,7 +137,8 @@ def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int], tru
                     copy_second_bot.bot_id: copy_second_bot,
                     copy_third_bot.bot_id: copy_third_bot,
                 }
+
                 bot_order_next = determine_bot_order(cards_on_table, bot_order, trump)
-                put_card_on_table(bot_id_mapping_next, bot_order_next, trump, current_depth + 1)
+                put_card_on_table(bot_id_mapping_next, bot_order_next, trump, current_depth + 1, max_depth)
 
 
