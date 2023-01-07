@@ -16,11 +16,11 @@ class Card:
 
 
 class MetaCard:
-    def __init__(self):
-        self.cards: List[Card] = []
-        self.suit = None
-        self.value = None
-        self.capacity = 0
+    def __init__(self, cards=None, suit=None, value=None, capacity=0):
+        self.cards: List[Card] = cards if cards is not None else []
+        self.suit = suit
+        self.value = value
+        self.capacity = capacity
 
     def add_card(self, card: Card):
         self.cards.append(card)
@@ -86,3 +86,5 @@ class MetaHand:
                 print(f"{self.format_card(metacard.get_cards()[j])}", end=" ")
             print(f"\n Value of metacard: {metacard.get_value()}")
             print(f" Suit of metacard: {metacard.get_suit()}")
+            print(f" Capacity of metacard: {metacard.get_capacity()}")
+

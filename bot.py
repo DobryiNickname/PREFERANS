@@ -37,28 +37,23 @@ class Bot:
                     meta_hand.add_metacard(meta_card)
 
         self.meta_hand = meta_hand
+
     @staticmethod
     def format_card(card: Card):
         return CARD_VALUE_DICT[card.get_value()] + CARD_SUIT_DICT[card.get_suit()]
 
+    # deprecated
     def show_hand(self) -> None:
         """
         Show sorted hand in terms of card's value and suit.
         :return: None
         """
         unsorted_hand = self.hand
+        if len(self.hand) == 0:
+            print(f"I'm bot {self.bot_id}. My hand is empty(")
         # Возможно передлать под кастомный запрос человека.
         sorted_hand = sorted(unsorted_hand, key=operator.attrgetter("suit", "value"), reverse=True)
         for card in sorted_hand:
             print(self.format_card(card), end=" ")
         print("\n")
 
-    # Это старый рандомный код, мб удалить нах
-    @staticmethod
-    def show_valid_moves(valid_moves):
-        unsorted_hand = valid_moves
-        # Возможно передлать под кастомный запрос человека.
-        sorted_hand = sorted(unsorted_hand, key=operator.attrgetter("suit", "value"), reverse=True)
-        for card in sorted_hand:
-            print(consts.CARD_VALUE_DICT[card.value]
-                  + consts.CARD_SUIT_DICT[card.suit])

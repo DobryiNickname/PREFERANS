@@ -10,10 +10,10 @@ CARD_VALUE_DICT = {
 }
 
 CARD_SUIT_DICT = {
-    0: "S",
-    1: "C",
-    2: "D",
-    3: "H"
+    0: "♠",
+    1: "♣",
+    2: "♦",
+    3: "♥"
 }
 
 SCORE_TABLE = {

@@ -1,5 +1,6 @@
 .idea/
 venv/
 get_pip.py
+lesson.py
 
 __pycache__/

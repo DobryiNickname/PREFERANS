@@ -1,4 +1,5 @@
 from utils import generate_hands_and_talon, put_card_on_table
+from logger import calcuate_average_timing
 from bot import Bot
 from card import MetaHand
 import consts
@@ -6,6 +7,12 @@ import consts
 import copy
 import time
 
+logger_d = {
+    "make_copy": [],
+    "decrease": [],
+    "valid_moves": [],
+    "determine_bot_order": [],
+}
 
 hands = generate_hands_and_talon()
 
@@ -16,8 +23,8 @@ bot0.meta_hand.show()
 
 bot1 = Bot(1)
 bot1.set_hand_and_metahand(hands["hand_2"])
-bot1.show_hand()
-bot1.meta_hand.show()
+#bot1.show_hand()
+#bot1.meta_hand.show()
 
 bot2 = Bot(2)
 bot2.set_hand_and_metahand(hands["hand_3"])
@@ -35,4 +42,16 @@ bot_order_mapping = {
     "third bot turn": [2, 0, 1],
 }
 
-put_card_on_table(bot_id_mapping, bot_order_mapping["first bot turn"], 0, 1, max_depth=4)
+start = time.time()
+put_card_on_table(
+    bot_id_mapping, 
+    bot_order_mapping["first bot turn"], 
+    trump=0, 
+    current_depth=1,
+    max_depth=4,
+    logger=logger_d,
+)
+end = time.time()
+print(end - start)
+
+calcuate_average_timing(logger_d)

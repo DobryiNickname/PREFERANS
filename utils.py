@@ -85,8 +85,23 @@ def determine_bot_order(cards_on_board: Dict[str, MetaCard], bot_order: List[int
     else:
         return bot_order_mapping["third bot turn"]
 
+def make_copy(obj: MetaHand):
+    copy_metahand = MetaHand(
+        metahand=[
+            MetaCard(
+                cards=i.cards[:],
+                suit=i.suit,
+                value=i.value,
+                capacity=i.capacity
+                ) 
+            for i in obj.metahand
+        ]
+    )
+    # copy_obj = copy.deepcopy(obj)
+    return copy_metahand
 
-def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int], trump, current_depth, max_depth=5):
+def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int], trump, current_depth, max_depth=5, logger={}):
+
     if current_depth > max_depth:
         return None
 
@@ -101,36 +116,68 @@ def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int], tru
 
     for first_card in first_bot.meta_hand.metahand:
         cards_on_table["first card"] = first_card
-        if current_depth == 1:
-            print(f'first card suit-{first_card.suit} value-{first_card.value}')
+        # if current_depth == 1:
+        #     print(f'first card suit-{first_card.suit} value-{first_card.value}')
 
         start = time.time()
-        copy_first_bot = Bot(
-            first_bot_id, 
-            meta_hand=MetaHand(metahand=first_bot.meta_hand.metahand[:]))
+        copy_first_bot = Bot(first_bot_id, meta_hand=make_copy(first_bot.meta_hand))
         end = time.time()
-        print(f"copy - {(end-start) * 10000}")
+        duration = end - start
+        logger['make_copy'].append(duration)
 
+        start = time.time()
         copy_first_bot.meta_hand.decrease_card_capacity(first_card)
+        end = time.time()
+        duration = end - start
+        logger['decrease'].append(duration)
+
         second_bot_id = bot_order[1]
         second_bot = bot_id_mapping[second_bot_id]
 
+        start = time.time()
         second_bot_valid_moves = valid_moves(second_bot.meta_hand, cards_on_table, trump=trump)
+        end = time.time()
+        duration = end - start
+        logger['valid_moves'].append(duration)
+        
         for second_card in second_bot_valid_moves:
             cards_on_table["second card"] = second_card
-            copy_second_bot = Bot(second_bot_id, 
-                meta_hand=MetaHand(metahand=second_bot.meta_hand.metahand[:]))
+            
+            start = time.time()
+            copy_second_bot = Bot(second_bot_id, meta_hand=make_copy(second_bot.meta_hand))
+            end = time.time()
+            duration = end - start
+            logger['make_copy'].append(duration)
+            
+            start = time.time()
             copy_second_bot.meta_hand.decrease_card_capacity(second_card)
+            end = time.time()
+            duration = end - start
+            logger['decrease'].append(duration)
 
             third_bot_id = bot_order[2]
             third_bot = bot_id_mapping[third_bot_id]
+
+            start = time.time()
             third_bot_valid_moves = valid_moves(third_bot.meta_hand, cards_on_table, trump=trump)
+            end = time.time()
+            duration = end - start
+            logger['valid_moves'].append(duration)
+            
             for third_card in third_bot_valid_moves:
                 cards_on_table["third card"] = third_card
 
-                copy_third_bot = Bot(third_bot_id,
-                    meta_hand=MetaHand(metahand=third_bot.meta_hand.metahand[:]))
+                start = time.time()
+                copy_third_bot = Bot(third_bot_id, meta_hand=make_copy(third_bot.meta_hand))
+                end = time.time()
+                duration = end - start
+                logger['make_copy'].append(duration)
+                
+                start = time.time()
                 copy_third_bot.meta_hand.decrease_card_capacity(third_card)
+                end = time.time()
+                duration = end - start
+                logger['decrease'].append(duration)
 
                 bot_id_mapping_next = {
                     copy_first_bot.bot_id: copy_first_bot,
@@ -138,7 +185,16 @@ def put_card_on_table(bot_id_mapping: Dict[int, Bot],  bot_order: List[int], tru
                     copy_third_bot.bot_id: copy_third_bot,
                 }
 
+                start = time.time()
                 bot_order_next = determine_bot_order(cards_on_table, bot_order, trump)
-                put_card_on_table(bot_id_mapping_next, bot_order_next, trump, current_depth + 1, max_depth)
+                end = time.time()
+                duration = end - start
+                logger['determine_bot_order'].append(duration)
 
-
+                put_card_on_table(
+                    bot_id_mapping_next, 
+                    bot_order_next, 
+                    trump, 
+                    current_depth + 1,
+                    max_depth, 
+                    logger)
