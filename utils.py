@@ -6,6 +6,8 @@ from typing import List, Dict
 from card import Card, MetaCard, MetaHand
 from bot import Bot
 
+from multiprocessing import Pool
+
 
 bot_order_mapping = {
     "first bot turn": [0, 1, 2],
@@ -86,17 +88,16 @@ def determine_bot_order(cards_on_board: Dict[str, MetaCard], bot_order: List[int
         return bot_order_mapping["third bot turn"]
 
 def make_copy(obj: MetaHand):
-    copy_metahand = MetaHand(
-        metahand=[
+    mh_list =[
             MetaCard(
                 cards=i.cards[:],
                 suit=i.suit,
                 value=i.value,
                 capacity=i.capacity
-                ) 
+                )
             for i in obj.metahand
         ]
-    )
+    copy_metahand = MetaHand(metahand=mh_list)
     # copy_obj = copy.deepcopy(obj)
     return copy_metahand
 

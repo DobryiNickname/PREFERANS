@@ -48,7 +48,7 @@ put_card_on_table(
     bot_order_mapping["first bot turn"], 
     trump=0, 
     current_depth=1,
-    max_depth=4,
+    max_depth=3,
     logger=logger_d,
 )
 end = time.time()

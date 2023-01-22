@@ -72,6 +72,7 @@ class MetaHand:
                 mc.decrease_capacity()
                 if mc.get_capacity() == 0:
                     self.metahand.remove(mc)
+                break
 
     @staticmethod
     def format_card(card: Card):
