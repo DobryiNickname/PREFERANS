@@ -1,6 +1,8 @@
 .idea/
 venv/
+myenv/
 get_pip.py
 lesson.py
+.vscode/
 
 __pycache__/

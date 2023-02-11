@@ -1,59 +1,59 @@
 import operator
-import consts
 from typing import List
+import logging
+import random
 
-from card import Card, MetaCard, MetaHand
+from card import Card
 from consts import CARD_SUIT_DICT, CARD_VALUE_DICT
 
 
 class Bot:
-    def __init__(self, bot_id, hand=None, meta_hand=None):
-        self.hand: List[Card] = hand
-        self.meta_hand: MetaHand = meta_hand
+    def __init__(self, bot_id: int, decision_mode, hand: List[int]=None):
+        self.hand = sorted(hand, key=operator.attrgetter("suit", "value"), reverse=True) if hand is not None else hand
         self.bot_id = bot_id
 
-    def set_hand_and_metahand(self, hand: List[Card]):
-        sort_hand = sorted(hand, key=operator.attrgetter("suit", "value"), reverse=True)
-        self.hand = sort_hand
-        meta_hand = MetaHand()
-        # Цикл по мастям для создания массива одномастных карт
-        for suit in range(4):
-            single_suit: List[Card] = []
-            for card in sort_hand:
-                if card.get_suit() == suit:
-                    single_suit.append(card)
-            # Помещаем соседние по силе карты в метакарту
-            if len(single_suit) != 0:
-                meta_card = MetaCard()
-                meta_card.add_card(single_suit[0])
-                for k in range(1, len(single_suit)):
-                    if single_suit[k].get_value() + 1 == single_suit[k - 1].get_value():
-                        meta_card.add_card(single_suit[k])
-                    else:
-                        meta_hand.add_metacard(meta_card)
-                        meta_card = MetaCard()
-                        meta_card.add_card(single_suit[k])
-                if meta_card.get_capacity() != 0:
-                    meta_hand.add_metacard(meta_card)
+        self.decision_functions = {
+            "MAXIMISE": self.baseline_choose_max_value_card,
+            "RANDOM": self.baseline_choose_random_value_card
+        }
 
-        self.meta_hand = meta_hand
+        self.decision_mode = decision_mode
+
+        self.logger = logging.getLogger()
 
     @staticmethod
     def format_card(card: Card):
         return CARD_VALUE_DICT[card.get_value()] + CARD_SUIT_DICT[card.get_suit()]
 
-    # deprecated
     def show_hand(self) -> None:
         """
         Show sorted hand in terms of card's value and suit.
-        :return: None
         """
-        unsorted_hand = self.hand
-        if len(self.hand) == 0:
-            print(f"I'm bot {self.bot_id}. My hand is empty(")
-        # Возможно передлать под кастомный запрос человека.
-        sorted_hand = sorted(unsorted_hand, key=operator.attrgetter("suit", "value"), reverse=True)
-        for card in sorted_hand:
+        if self.hand is None:
+            self.logger.error(f"I'm bot {self.bot_id}. My hand is empty")
+            raise ValueError("self.hand is None")
+        
+        for card in self.hand:
             print(self.format_card(card), end=" ")
         print("\n")
 
+    def _remove_card_from_hand(self, card: Card):
+        self.hand.remove(card)
+
+    def make_decision(self, valid_moves, trump):
+        return(self.decision_functions[self.decision_mode](valid_moves, trump))
+
+    def baseline_choose_max_value_card(self, valid_moves: List[Card], trump):
+        if trump is not None and trump in [card.get_suit() for card in valid_moves]:
+            possible_cards = [card for card in valid_moves if card.get_suit() == trump]
+        else:
+            possible_cards = sorted(valid_moves, key=operator.attrgetter("value"), reverse=True)
+
+        max_choice = 0
+        self._remove_card_from_hand(possible_cards[max_choice])
+        return possible_cards[max_choice]
+
+    def baseline_choose_random_value_card(self, valid_moves: List[Card], trump):
+        rnd_choice = random.choice(valid_moves)
+        self._remove_card_from_hand(rnd_choice)
+        return rnd_choice

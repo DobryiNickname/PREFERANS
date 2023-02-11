@@ -1,3 +1,5 @@
+from colorama import Fore
+
 CARD_VALUE_DICT = {
     0: "7",
     1: "8",
