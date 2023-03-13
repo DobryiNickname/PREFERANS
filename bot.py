@@ -8,7 +8,7 @@ from consts import CARD_SUIT_DICT, CARD_VALUE_DICT
 
 
 class Bot:
-    def __init__(self, bot_id: int, decision_mode, hand: List[int]=None):
+    def __init__(self, bot_id: int, decision_mode, hand: List[Card]=None):
         self.hand = sorted(hand, key=operator.attrgetter("suit", "value"), reverse=True) if hand is not None else hand
         self.bot_id = bot_id
 
